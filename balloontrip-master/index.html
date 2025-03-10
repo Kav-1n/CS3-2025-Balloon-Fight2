@@ -1,0 +1,172 @@
+<html>
+<head>
+    <title>JS Balloon Trip</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="A clone of the classic 8-bit game Balloon Trip from Balloon Fight.
+        A quick experiment using javascript and svgs to recreate 8-bit gameplay.">
+    <meta name="keywords" content="Famicom, NES, Game, 8-bit, Balloon Fight, Clone, JavaScript, SVG">
+    <meta name="author" content="Leonard M Witzel">
+
+    <script type="text/javascript" src="svg.min.js"></script>
+    <script type="text/javascript" src="bitmap.js"></script>
+    <script type="text/javascript" src="game.js"></script>
+    <script type="text/javascript" src="util.js"></script>
+    <script type="text/javascript" src="events.js"></script>
+    <script type="text/javascript" src="audio.js"></script>
+    <script type="text/javascript" src="physics.js"></script>
+    <script type="text/javascript" src="control.js"></script>
+    <script type="text/javascript" src="sprite.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+    <style type="text/css">
+        @font-face {
+            font-family: 'Press Start 2P';
+            src: url('fonts/PressStart2P.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'NES';
+            src: url('fonts/NES2.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'Nintendo';
+            src: url('fonts/Nintend Bold.otf') format('opentype');
+        }
+
+        body{
+            background-color: #bbb;
+            height:100%;
+            overflow: hidden;
+        }
+        .press2p{
+            font-family: 'Press Start 2P';
+        }
+        .nes{
+            font-family: 'NES';
+        }
+        .nintendo{
+            font-family: 'Nintendo';
+        }
+
+        #screen{
+            width:800px;
+            height:480px;
+            overflow: hidden;
+            border-radius: 10px;
+            margin:auto;
+            margin-top:10px;
+            z-index:2;
+            position: relative;
+            border: 3px solid #f2ebe2;
+        }
+        .info{
+            width:800px;
+            font-size: 0.9em;
+            padding:10px;
+            /*color: #f60;*/
+            /*color: #aaa;*/
+            color:#f2ebe2;
+            margin:auto;
+            /*margin-top:10px;*/
+        }
+        .info span{
+            font-size: 0.8em;
+            line-height: 1.6em;
+        }
+        .key{
+            /*color:#e9dbbf;*/
+            color:#874849;
+        }
+        .about{
+            font-size: 0.7em;
+        }
+        .about a{
+            /*color:#39f;*/
+            /*color:#874849;*/
+            color: #ff2844;
+            margin-left: -12px;
+            text-decoration: none;
+            vertical-align: middle;
+            font-size: 1.5em;
+        }
+        .about a:hover{
+            text-decoration: underline;
+        }
+        .about a:visited{
+            /*color:#39f;*/
+            /*color:#874849;*/
+            color: #ff2844;
+            text-decoration: none;
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        .bg-image{
+            position:absolute;
+            right:2%;
+            bottom: 10;
+            width:40%;
+            z-index:1;
+            transform: rotate(6deg);
+        }
+        h1.nintendo{
+            /*border-bottom: 2px solid #874849;*/
+             color:#874849;
+        }
+        .title{
+            width:800px;
+            margin:auto;
+
+        }
+        .title img{
+            width:250px;
+        }
+        .about .symbol{
+            font-size: 3em;
+            vertical-align: middle;
+            text-shadow: 1px 1px 5px #666;
+        }
+        .elipsis{
+            font-family:sans-serif;
+            font-size:2em;
+            color: #ff2844;
+            font-weight:bold;
+        }
+    </style>
+    <link rel="apple-touch-icon" sizes="57x57" href="favicons/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="favicons/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="favicons/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="favicons/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="favicons/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="favicons/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="favicons/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="favicons/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="favicons/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="favicons/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+</head>
+<body>
+    <div id="screen" class="press2p"></div>
+    <!-- <a href="javascript:;" onclick="toggleFullscreen();" >fullscreen</a> -->
+    <div class="info press2p">
+        <h1 class="nintendo">Controls</h1>
+        <p>
+            <span class="key">SPACE:</span><span> START, PAUSE, RESET</span><br>
+            <span class="key">SHIFT:</span><span> SELECT</span><br>
+            <span class="key">Z KEY:</span><span> FLAP</span><br>
+            <span class="key">&larr; KEY:</span><span> LEFT</span><br>
+            <span class="key">&rarr; KEY:</span><span> RIGHT</span><br>
+            <br>
+            <span> </span>
+        </p>
+        <p class="about">
+            <span class="symbol">&#x1F388;</span>
+            <a href="https://github.com/kav-1n/" class="about nintendo" target="_blank">technical details<span class="elipsis">&hellip;</span></a>
+        </p>
+    </div>
+    <img src="images/famicom.svg" class="bg-image">
+</body>
+</html>
